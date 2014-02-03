@@ -1,6 +1,8 @@
 var app = angular.module('seeds', []);
 
-app.filter('encodeURIComponent', window.encodeURIComponent);
+app.filter('encodeURIComponent', function() {
+    return window.encodeURIComponent;
+});
 
 app.controller('SeedsController', function SeedsController($scope, $http) {
     var reset = function() {
