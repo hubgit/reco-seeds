@@ -7,6 +7,7 @@ var SeedsController = function($scope, $http) {
 
     $scope.showArtists = function(show) {
         $scope.episode = null;
+        $scope.brand = null;
         $scope.artists = [];
         $scope.reco = '';
 
