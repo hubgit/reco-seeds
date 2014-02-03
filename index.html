@@ -1,0 +1,58 @@
+<!doctype html>
+<html ng-app="SeedsApp">
+<meta charset="utf-8">
+
+<!-- metadata -->
+<title>ReCo Seeds</title>
+
+<!-- styles -->
+<link rel="stylesheet" href="bootstrap-cyborg.css">
+<link rel="stylesheet" href="seeds.css">
+
+<!-- scripts -->
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.10/angular.min.js"></script>
+<script src="seeds.js"></script>
+<script>
+angular.module('SeedsApp', []).filter('encodeURIComponent', function() {
+        return window.encodeURIComponent;
+}).controller('SeedsController', SeedsController);
+</script>
+
+<body class="container" ng-controller="SeedsController">
+	<div id="seeds">
+		<h1>BBC Radio</h1>
+
+		<ul class="list-unstyled">
+			<li ng-repeat="show in shows | orderBy:title" ng-click="showArtists(show)">{{ show.title }}</li>
+		</ul>
+
+		<div ng-show="!shows">Loading…</div>
+	</div>
+
+	<div id="artists">
+		<h1>
+			<a href="http://www.bbc.co.uk/programmes/{{ brand.pid }}" target="_blank">{{ brand.title }}</a>
+		</h1>
+
+		<h2>
+			<a href="http://www.bbc.co.uk/programmes/{{ episode.pid }}" target="_blank">{{ episode.title }}</a>
+		</h2>
+
+		<div ng-show="reco">
+			<a href="http://git.macropus.org/reco/?{{ reco }}" class="btn btn-primary" target="_blank">ReCo</a>
+		</div>
+
+		<ul class="list-unstyled">
+			<li ng-repeat="artist in artists" ng-click="addArtist(artist)"
+				itemscope itemtype="http://schema.org/MusicGroup">
+				<a ng-href="http://git.macropus.org/reco/?artist={{ artist.name | encodeURIComponent }}" target="_blank" itemprop="name">{{ artist.name }}</a>
+				<div itemprop="keywords">
+					<span class="tag" ng-repeat="tag in artist.tags | limitTo:5">{{ tag.name }}</span>
+				</div>
+			</li>
+		</ul>
+
+		<div ng-show="episode &amp;&amp; !artists">Loading…</div>
+	</div>
+</body>
+</html>
