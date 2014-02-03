@@ -49,9 +49,9 @@
 					ng-click="addArtist(artist)"
 					itemscope itemtype="http://schema.org/MusicGroup">
 					<a ng-href="http://git.macropus.org/reco/?artist={{ artist.name | encodeURIComponent }}"
-						target="_blank" itemprop="name">{{ artist.name }}</a>
-					<div itemprop="keywords">
-						<span class="tag" ng-repeat="tag in artist.tags | limitTo:5">{{ tag.name }}</span>
+						target="_blank"><span itemprop="name">{{ artist.name }}</span></a>
+					<div>
+						<span class="tag" itemprop="keywords" ng-repeat="tag in artist.tags | limitTo:5">{{ tag.name }}</span>
 					</div>
 				</li>
 			</ul>
