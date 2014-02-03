@@ -4,7 +4,7 @@ app.filter('encodeURIComponent', function() {
     return window.encodeURIComponent;
 });
 
-app.controller('SeedsController', function SeedsController($scope, $http) {
+app.controller('SeedsController', function ($scope, $http) {
     var reset = function() {
         $scope.episode = null;
         $scope.brand = null;
@@ -60,7 +60,14 @@ app.controller('SeedsController', function SeedsController($scope, $http) {
 
                         var artist = { name: name, tags: [] };
 
-                        $http.get('http://ws.audioscrobbler.com/2.0/?method=artist.gettoptags&api_key=ffae7cc247f46daec72f7b112ee4d353&format=json&artist=' + name).success(function(data) {
+                        $http.get('http://ws.audioscrobbler.com/2.0/', {
+                            params: {
+                                method: 'artist.gettoptags',
+                                api_key: 'ffae7cc247f46daec72f7b112ee4d353',
+                                format: 'json',
+                                artist: name
+                            }
+                        }).success(function(data) {
                             if (data.error) {
                                 return;
                             }
