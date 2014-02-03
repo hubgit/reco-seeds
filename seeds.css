@@ -3,12 +3,12 @@ html, body {
 	overflow-y: hidden;
 }
 
-body {
+#main {
 	display: flex;
 	flex-flow: row wrap;
 }
 
-body > div {
+#main > div {
 	padding: 20px;
 	height: 100%;
 	overflow-y: auto;
@@ -17,6 +17,10 @@ body > div {
 
 #artists {
 	flex: 1;
+}
+
+#genres {
+	margin-bottom: 10px;
 }
 
 h1 {

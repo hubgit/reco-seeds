@@ -19,40 +19,52 @@ angular.module('SeedsApp', []).filter('encodeURIComponent', function() {
 </script>
 
 <body class="container" ng-controller="SeedsController">
-	<div id="seeds">
-		<h1>BBC Radio</h1>
-
-		<ul class="list-unstyled">
-			<li ng-repeat="show in shows | orderBy:title" ng-click="showArtists(show)">{{ show.title }}</li>
-		</ul>
-
-		<div ng-show="!shows">Loading…</div>
-	</div>
-
-	<div id="artists">
-		<h1>
-			<a href="http://www.bbc.co.uk/programmes/{{ brand.pid }}" target="_blank">{{ brand.title }}</a>
-		</h1>
-
-		<h2>
-			<a href="http://www.bbc.co.uk/programmes/{{ episode.pid }}" target="_blank">{{ episode.title }}</a>
-		</h2>
-
-		<div ng-show="reco">
-			<a href="http://git.macropus.org/reco/?{{ reco }}" class="btn btn-primary" target="_blank">ReCo</a>
-		</div>
-
-		<ul class="list-unstyled">
-			<li ng-repeat="artist in artists" ng-click="addArtist(artist)"
-				itemscope itemtype="http://schema.org/MusicGroup">
-				<a ng-href="http://git.macropus.org/reco/?artist={{ artist.name | encodeURIComponent }}" target="_blank" itemprop="name">{{ artist.name }}</a>
-				<div itemprop="keywords">
-					<span class="tag" ng-repeat="tag in artist.tags | limitTo:5">{{ tag.name }}</span>
-				</div>
+	<nav>
+		<ul id="genres" class="nav nav-tabs">
+			<li ng-class="{ active: !activeGenre }"><a>All</a></li>
+			<li ng-repeat="genre in genres"
+				ng-class="{ active: activeGenre === genre.key }">
+				<a ng-click="showGenre(genre.key)">{{ genre.title }}</a>
 			</li>
 		</ul>
+	</nav>
 
-		<div ng-show="episode &amp;&amp; !artists">Loading…</div>
+	<div id="main">
+		<div id="seeds">
+			<ul class="list-unstyled">
+				<li ng-repeat="show in shows | orderBy:title"
+					ng-click="showArtists(show)">{{ show.title }}</li>
+			</ul>
+
+			<div ng-show="!shows">Loading…</div>
+		</div>
+
+		<div id="artists" ng-show="episode">
+			<h1>
+				<a ng-show="reco" href="http://git.macropus.org/reco/?{{ reco }}" class="btn btn-primary" target="_blank">ReCo</a>
+				<a href="http://www.bbc.co.uk/programmes/{{ brand.pid }}" target="_blank">{{ brand.title }}</a>
+			</h1>
+
+			<h2>
+				<a href="http://www.bbc.co.uk/programmes/{{ episode.pid }}" target="_blank">{{ episode.title }}</a>
+			</h2>
+
+			<ul class="list-unstyled" ng-show="artists.length">
+				<li ng-repeat="artist in artists"
+					ng-click="addArtist(artist)"
+					itemscope itemtype="http://schema.org/MusicGroup">
+					<a ng-href="http://git.macropus.org/reco/?artist={{ artist.name | encodeURIComponent }}"
+						target="_blank" itemprop="name">{{ artist.name }}</a>
+					<div itemprop="keywords">
+						<span class="tag" ng-repeat="tag in artist.tags | limitTo:5">{{ tag.name }}</span>
+					</div>
+				</li>
+			</ul>
+
+			<div class="alert alert-error" ng-show="!loading &amp;&amp; !artists.length">Track listing not available for this episode</div>
+
+			<div ng-show="loading">Loading…</div>
+		</div>
 	</div>
 </body>
 </html>

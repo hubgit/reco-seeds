@@ -1,15 +1,29 @@
 var SeedsController = function($scope, $http) {
-    $http.get('http://www.bbc.co.uk/programmes/genres/music/player.json').success(function(data) {
-        $scope.shows = data.category_slice.programmes.filter(function(programme) {
-            return programme.type === 'brand';
+    $scope.showGenre = function(genre) {
+        $scope.activeGenre = genre;
+        $scope.shows = null;
+
+        var path = genre ? 'music/' + genre : 'music'
+
+        $http.get('http://www.bbc.co.uk/programmes/genres/' + path + '/player.json').success(function(data) {
+            $scope.shows = data.category_slice.programmes.filter(function(programme) {
+                return programme.type === 'brand';
+            });
+
+            if (!genre) {
+                $scope.genres = data.category_slice.category.narrower;
+            }
         });
-    });
+    };
+
+    $scope.showGenre();
 
     $scope.showArtists = function(show) {
         $scope.episode = null;
         $scope.brand = null;
         $scope.artists = [];
         $scope.reco = '';
+        $scope.loading = true;
 
         $http.get('http://www.bbc.co.uk/programmes/' + show.pid + '/episodes/player.json').success(function(data) {
             $scope.episode = data.episodes[0].programme;
@@ -44,6 +58,8 @@ var SeedsController = function($scope, $http) {
 
                         return artist;
                     });
+
+                    $scope.loading = false;
                 });
             });
         });
