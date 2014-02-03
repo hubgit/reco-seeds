@@ -13,22 +13,17 @@ body {
 	flex-flow: row wrap;
 	flex: 1;
 	height: 100%;
-	box-sizing: box;
+	overflow-y: hidden;
 }
 
 #main > div {
-	padding: 20px;
-	height: 100%;
+	padding: 10px 20px;
 	overflow-y: auto;
-	box-sizing: border-box;
+	height: 100%;
 }
 
 #artists {
 	flex: 1;
-}
-
-#genres {
-	margin-bottom: 10px;
 }
 
 h1 {
@@ -41,6 +36,11 @@ li {
 
 li:hover {
 	color: yellow;
+}
+
+.nav-tabs > li > a {
+	font-size: 11px;
+	padding: 5px;
 }
 
 .tag {

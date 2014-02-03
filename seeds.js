@@ -1,5 +1,18 @@
-var SeedsController = function($scope, $http) {
+var app = angular.module('seeds', []);
+
+app.filter('encodeURIComponent', window.encodeURIComponent);
+
+app.controller('SeedsController', function SeedsController($scope, $http) {
+    var reset = function() {
+        $scope.episode = null;
+        $scope.brand = null;
+        $scope.artists = [];
+        $scope.reco = '';
+    };
+
     $scope.showGenre = function(genre) {
+        reset();
+
         $scope.activeGenre = genre;
         $scope.shows = null;
 
@@ -19,10 +32,7 @@ var SeedsController = function($scope, $http) {
     $scope.showGenre();
 
     $scope.showArtists = function(show) {
-        $scope.episode = null;
-        $scope.brand = null;
-        $scope.artists = [];
-        $scope.reco = '';
+        reset();
         $scope.loading = true;
 
         $http.get('http://www.bbc.co.uk/programmes/' + show.pid + '/episodes/player.json').success(function(data) {
@@ -64,4 +74,4 @@ var SeedsController = function($scope, $http) {
             });
         });
     };
-}
+});

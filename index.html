@@ -1,5 +1,5 @@
 <!doctype html>
-<html ng-app="SeedsApp">
+<html ng-app="seeds">
 <meta charset="utf-8">
 
 <!-- metadata -->
@@ -12,11 +12,6 @@
 <!-- scripts -->
 <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.10/angular.min.js"></script>
 <script src="seeds.js"></script>
-<script>
-angular.module('SeedsApp', []).filter('encodeURIComponent', function() {
-        return window.encodeURIComponent;
-}).controller('SeedsController', SeedsController);
-</script>
 
 <body class="container" ng-controller="SeedsController">
 	<nav>
