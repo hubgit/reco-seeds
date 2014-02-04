@@ -6,6 +6,7 @@ app.filter('encodeURIComponent', function() {
 
 app.controller('SeedsController', function ($scope, $http, $sce) {
     var reset = function() {
+        $scope.spotify = null;
         $scope.episode = null;
         $scope.brand = null;
         $scope.player = null;
