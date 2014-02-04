@@ -97,28 +97,39 @@ app.controller('SeedsController', function ($scope, $http, $sce) {
     };
 
     $scope.showPlayer = function() {
+        var ids = [];
+
         var requests = $scope.tracks.map(function(track) {
             var query = { track: track.name, artist: track.artist.name };
 
             var request = $.spotify.search('track', query);
 
             request.progress(function(jqXHR, textStatus, item) {
-                if (textStatus == 'start') {
-                    $scope.spotify = 'Looking up ' + track.artist.name + ' - ' + track.name;
+                switch (textStatus) {
+                    case 'start':
+                        $scope.spotify = 'Looking up ' + track.artist.name + ' - ' + track.name;
+                        break;
+
+                    case 'rate-limit':
+                        $scope.spotify = 'Rate-limited; waiting…';
+                        break;
+
+                    $scope.$apply();
+                }
+            });
+
+            request.done(function(data) {
+                if (data.tracks && data.tracks.length) {
+                    var id = data.tracks[0].href.replace(/^spotify:track:/, '');
+                    ids.push(id);
                 }
             });
 
             return request;
         });
 
-        $.when.apply($, requests).then(function() {
+        var generateTrackset = function() {
             $scope.spotify = null;
-
-            var ids = Array.prototype.map.call(arguments, function(data) {
-                if (data[0].tracks && data[0].tracks.length) {
-                    return data[0].tracks[0].href.replace(/^spotify:track:/, '');
-                }
-            });
 
             if (ids.length) {
                 var url = 'https://embed.spotify.com/?uri=spotify:trackset:playlist:' + ids.join(',');
@@ -126,6 +137,8 @@ app.controller('SeedsController', function ($scope, $http, $sce) {
                 $scope.player = $sce.trustAsResourceUrl(url);
                 $scope.$apply();
             }
-        });
+        };
+
+        $.when.apply($, requests).then(generateTrackset, generateTrackset);
     };
 });

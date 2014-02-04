@@ -23,12 +23,12 @@ body {
 
 #main #player {
 	padding: 0;
-	width: 300px;
+	width: 360px;
 	overflow-y: hidden;
 }
 
 #main #spotify {
-	width: 300px;
+	width: 360px;
 }
 
 #tracks {
