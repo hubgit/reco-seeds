@@ -11,9 +11,12 @@
 
 <!-- scripts -->
 <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.10/angular.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script src="http://git.macropus.org/jquery-ajax-queue/jquery.ajaxQueue.js"></script>
+<script src="http://git.macropus.org/jquery-spotify/jquery.spotify.js"></script>
 <script src="seeds.js"></script>
 
-<body class="container" ng-controller="SeedsController">
+<body ng-controller="SeedsController">
 	<nav>
 		<ul id="genres" class="nav nav-tabs">
 			<li ng-class="{ active: !activeGenre }"><a>All</a></li>
@@ -28,13 +31,13 @@
 		<div id="seeds">
 			<ul class="list-unstyled">
 				<li ng-repeat="show in shows | orderBy:title"
-					ng-click="showArtists(show)">{{ show.title }}</li>
+					ng-click="showTracks(show)">{{ show.title }}</li>
 			</ul>
 
 			<div ng-show="!shows">Loading…</div>
 		</div>
 
-		<div id="artists" ng-show="episode">
+		<div id="tracks" ng-show="episode">
 			<h1>
 				<a ng-show="reco" href="http://git.macropus.org/reco/?{{ reco }}" class="btn btn-primary" target="_blank">ReCo</a>
 				<a href="http://www.bbc.co.uk/programmes/{{ brand.pid }}" target="_blank">{{ brand.title }}</a>
@@ -44,21 +47,30 @@
 				<a href="http://www.bbc.co.uk/programmes/{{ episode.pid }}" target="_blank">{{ episode.title }}</a>
 			</h2>
 
-			<ul class="list-unstyled" ng-show="artists.length">
-				<li ng-repeat="artist in artists"
-					ng-click="addArtist(artist)"
-					itemscope itemtype="http://schema.org/MusicGroup">
-					<a ng-href="http://git.macropus.org/reco/?artist={{ artist.name | encodeURIComponent }}"
-						target="_blank"><span itemprop="name">{{ artist.name }}</span></a>
+			<ul class="list-unstyled" ng-show="tracks.length">
+				<li ng-repeat="track in tracks"
+					itemscope itemtype="http://schema.org/MusicRecording">
 					<div>
-						<span class="tag" itemprop="keywords" ng-repeat="tag in artist.tags | limitTo:5">{{ tag.name }}</span>
+						<a ng-href="http://git.macropus.org/reco/?artist={{ track.artist.name | encodeURIComponent }}"
+							target="_blank" itemprop="byArtist"
+							itemscope itemtype="http://schema.org/MusicArtist"><span itemprop="name">{{ track.artist.name }}</span></a>
+							-
+						<span itemprop="name">{{ track.name }}</span>
+					</div>
+
+					<div>
+						<span class="tag" itemprop="keywords" ng-repeat="tag in track.tags | limitTo:5">{{ tag.name }}</span>
 					</div>
 				</li>
 			</ul>
 
-			<div class="alert alert-error" ng-show="!loading &amp;&amp; !artists.length">Track listing not available for this episode</div>
+			<div class="alert alert-error" ng-show="!loading &amp;&amp; !tracks.length">Track listing not available for this episode</div>
 
 			<div ng-show="loading">Loading…</div>
+		</div>
+
+		<div id="player" ng-show="player">
+			<iframe ng-src="{{player}}" frameborder="0" allowtransparency="true"></iframe>
 		</div>
 	</div>
 </body>

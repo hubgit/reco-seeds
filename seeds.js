@@ -4,11 +4,12 @@ app.filter('encodeURIComponent', function() {
     return window.encodeURIComponent;
 });
 
-app.controller('SeedsController', function ($scope, $http) {
+app.controller('SeedsController', function ($scope, $http, $sce) {
     var reset = function() {
         $scope.episode = null;
         $scope.brand = null;
-        $scope.artists = [];
+        $scope.player = null;
+        $scope.tracks = [];
         $scope.reco = '';
     };
 
@@ -33,7 +34,7 @@ app.controller('SeedsController', function ($scope, $http) {
 
     $scope.showGenre();
 
-    $scope.showArtists = function(show) {
+    $scope.showTracks = function(show) {
         reset();
         $scope.loading = true;
 
@@ -45,42 +46,76 @@ app.controller('SeedsController', function ($scope, $http) {
                 var version = data.programme.versions[0];
 
                 $http.get('http://www.bbc.co.uk/programmes/' + version.pid + '.json').success(function(data) {
-                    $scope.artists = data.version.segment_events.map(function(segment_event) {
+                    $scope.tracks = data.version.segment_events.map(function(segment_event) {
                         var segment = segment_event.segment;
 
-                        if (segment.primary_contributor) {
-                            return segment.primary_contributor.name;
+                        var track = {
+                            name: segment.title,
+                            tags: [],
+                            artist: {
+                                name: segment.artist,
+                            },
                         }
 
-                        return segment.artist;
-                    }).filter(function(name) {
-                        return name;
-                    }).map(function(name) {
-                        $scope.reco += '&artist=' + encodeURIComponent(name);
+                        if (segment.primary_contributor) {
+                            track.artist.name = segment.primary_contributor.name;
+                        }
 
-                        var artist = { name: name, tags: [] };
+                        return track;
+                    }).filter(function(track) {
+                        return track.name && track.artist.name;
+                    }).map(function(track) {
+                        $scope.reco += '&artist=' + encodeURIComponent(track.artist.name);
 
                         $http.get('http://ws.audioscrobbler.com/2.0/', {
                             params: {
-                                method: 'artist.gettoptags',
+                                method: 'track.gettoptags',
                                 api_key: 'ffae7cc247f46daec72f7b112ee4d353',
                                 format: 'json',
-                                artist: name
+                                track: track.name,
+                                artist: track.artist.name,
                             }
                         }).success(function(data) {
                             if (data.error) {
                                 return;
                             }
 
-                            artist.tags = data.toptags.tag;
+                            track.tags = data.toptags.tag;
                         });
 
-                        return artist;
+                        return track;
                     });
 
                     $scope.loading = false;
+
+                    if ($scope.tracks.length) {
+                        $scope.showPlayer();
+                    }
                 });
             });
+        });
+    };
+
+    $scope.showPlayer = function() {
+        var requests = $scope.tracks.map(function(track) {
+            var query = { track: track.name, artist: track.artist.name };
+
+            return $.spotify.search('track', query);
+        });
+
+        $.when.apply($, requests).then(function() {
+            var ids = Array.prototype.map.call(arguments, function(data) {
+                if (data[0].tracks && data[0].tracks.length) {
+                    return data[0].tracks[0].href.replace(/^spotify:track:/, '');
+                }
+            });
+
+            if (ids.length) {
+                var url = 'https://embed.spotify.com/?uri=spotify:trackset:playlist:' + ids.join(',');
+
+                $scope.player = $sce.trustAsResourceUrl(url);
+                $scope.$apply();
+            }
         });
     };
 });
