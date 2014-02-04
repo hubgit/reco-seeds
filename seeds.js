@@ -1,12 +1,12 @@
-var app = angular.module('seeds', []);
+var app = angular.module('seeds', ['luegg.directives']);
 
 app.filter('encodeURIComponent', function() {
     return window.encodeURIComponent;
 });
 
-app.controller('SeedsController', function ($scope, $http, $sce) {
+app.controller('SeedsController', function ($scope, $http, $sce, $timeout) {
     var reset = function() {
-        $scope.spotify = null;
+        $scope.spotify = [];
         $scope.episode = null;
         $scope.brand = null;
         $scope.player = null;
@@ -35,6 +35,47 @@ app.controller('SeedsController', function ($scope, $http, $sce) {
 
     $scope.showGenre();
 
+    var fetchTags = function(track) {
+        $scope.reco += '&artist=' + encodeURIComponent(track.artist.name);
+
+        var request = $.ajaxQueue({
+            url: 'http://ws.audioscrobbler.com/2.0/',
+            data: {
+                method: 'track.gettoptags',
+                api_key: 'ffae7cc247f46daec72f7b112ee4d353',
+                format: 'json',
+                track: track.name,
+                artist: track.artist.name,
+            }
+        });
+
+        request.done(function(data) {
+            if (!data.error) {
+                $timeout(function() {
+                    track.tags = data.toptags.tag;
+                });
+            }
+        });
+    };
+
+    var buildTrack = function(segment_event) {
+        var segment = segment_event.segment;
+
+        var track = {
+            name: segment.title,
+            tags: [],
+            artist: {
+                name: segment.artist,
+            },
+        }
+
+        if (segment.primary_contributor) {
+            track.artist.name = segment.primary_contributor.name;
+        }
+
+        return track;
+    };
+
     $scope.showTracks = function(show) {
         reset();
         $scope.loading = true;
@@ -47,44 +88,8 @@ app.controller('SeedsController', function ($scope, $http, $sce) {
                 var version = data.programme.versions[0];
 
                 $http.get('http://www.bbc.co.uk/programmes/' + version.pid + '.json').success(function(data) {
-                    $scope.tracks = data.version.segment_events.map(function(segment_event) {
-                        var segment = segment_event.segment;
-
-                        var track = {
-                            name: segment.title,
-                            tags: [],
-                            artist: {
-                                name: segment.artist,
-                            },
-                        }
-
-                        if (segment.primary_contributor) {
-                            track.artist.name = segment.primary_contributor.name;
-                        }
-
-                        return track;
-                    }).filter(function(track) {
+                    $scope.tracks = data.version.segment_events.map(buildTrack).filter(function(track) {
                         return track.name && track.artist.name;
-                    }).map(function(track) {
-                        $scope.reco += '&artist=' + encodeURIComponent(track.artist.name);
-
-                        $http.get('http://ws.audioscrobbler.com/2.0/', {
-                            params: {
-                                method: 'track.gettoptags',
-                                api_key: 'ffae7cc247f46daec72f7b112ee4d353',
-                                format: 'json',
-                                track: track.name,
-                                artist: track.artist.name,
-                            }
-                        }).success(function(data) {
-                            if (data.error) {
-                                return;
-                            }
-
-                            track.tags = data.toptags.tag;
-                        });
-
-                        return track;
                     });
 
                     $scope.loading = false;
@@ -92,6 +97,8 @@ app.controller('SeedsController', function ($scope, $http, $sce) {
                     if ($scope.tracks.length) {
                         $scope.showPlayer();
                     }
+
+                    $scope.tracks.forEach(fetchTags);
                 });
             });
         });
@@ -106,17 +113,17 @@ app.controller('SeedsController', function ($scope, $http, $sce) {
             var request = $.spotify.search('track', query);
 
             request.progress(function(jqXHR, textStatus, item) {
-                switch (textStatus) {
-                    case 'start':
-                        $scope.spotify = 'Looking up ' + track.artist.name + ' - ' + track.name;
-                        break;
+                $timeout(function() {
+                    switch (textStatus) {
+                        case 'start':
+                            $scope.spotify.push('Finding ' + track.artist.name + ' - ' + track.name);
+                            break;
 
-                    case 'rate-limit':
-                        $scope.spotify = 'Rate-limited; waiting…';
-                        break;
-
-                    $scope.$apply();
-                }
+                        case 'rate-limit':
+                            $scope.spotify.push('Rate-limited; waiting…');
+                            break;
+                    }
+                });
             });
 
             request.done(function(data) {
@@ -130,10 +137,10 @@ app.controller('SeedsController', function ($scope, $http, $sce) {
         });
 
         var generateTrackset = function() {
-            $scope.spotify = null;
+            $scope.spotify = [];
 
             if (ids.length) {
-                var url = 'https://embed.spotify.com/?uri=spotify:trackset:playlist:' + ids.join(',');
+                var url = 'https://embed.spotify.com/?theme=black&uri=spotify:trackset:playlist:' + ids.join(',');
 
                 $scope.player = $sce.trustAsResourceUrl(url);
                 $scope.$apply();

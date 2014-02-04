@@ -6,7 +6,7 @@
 <title>ReCo Seeds</title>
 
 <!-- styles -->
-<link rel="stylesheet" href="bootstrap-cyborg.css">
+<link rel="stylesheet" href="lib/bootswatch/bootstrap-cyborg.css">
 <link rel="stylesheet" href="seeds.css">
 
 <!-- scripts -->
@@ -14,6 +14,7 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <script src="http://git.macropus.org/jquery-ajax-queue/jquery.ajaxQueue.js"></script>
 <script src="http://git.macropus.org/jquery-spotify/jquery.spotify.js"></script>
+<script src="lib/angular-scrollglue/scrollglue.js"></script>
 <script src="seeds.js"></script>
 
 <body ng-controller="SeedsController">
@@ -22,7 +23,7 @@
 			<li ng-class="{ active: !activeGenre }"><a>All</a></li>
 			<li ng-repeat="genre in genres"
 				ng-class="{ active: activeGenre === genre.key }">
-				<a ng-click="showGenre(genre.key)">{{ genre.title }}</a>
+				<a href="#" ng-click="showGenre(genre.key)">{{ genre.title }}</a>
 			</li>
 		</ul>
 	</nav>
@@ -69,9 +70,13 @@
 			<div ng-show="loading">Loading…</div>
 		</div>
 
-		<iframe id="player" ng-show="player" ng-src="{{player}}" frameborder="0" allowtransparency="true"></iframe>
+		<div id="player" ng-show="player">
+			<iframe ng-src="{{player}}"></iframe>
+		</div>
 
-		<div id="spotify" ng-show="spotify">{{ spotify }}</div>
+		<div id="spotify" ng-show="spotify &amp;&amp; spotify.length" scroll-glue>
+			<div ng-repeat="message in spotify">{{ message }}</div>
+		</div>
 	</div>
 </body>
 </html>

@@ -19,16 +19,25 @@ body {
 #main > div {
 	padding: 10px 20px;
 	overflow-y: auto;
+	min-width: 200px;
 }
 
 #main #player {
 	padding: 0;
-	width: 360px;
-	overflow-y: hidden;
+	display: flex;
+	flex-flow: column;
+	overflow: hidden;
+}
+
+#main #player iframe {
+	border: none;
+	width: 380px;
+	flex: 1;
 }
 
 #main #spotify {
-	width: 360px;
+	width: 380px;
+	font-size: 80%;
 }
 
 #tracks {
