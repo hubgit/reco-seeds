@@ -1,6 +1,8 @@
 html, body {
 	height: 100%;
+	width: 100%;
 	overflow-y: hidden;
+	margin: 0;
 }
 
 body {
@@ -10,16 +12,13 @@ body {
 
 #main {
 	display: flex;
-	flex-flow: row wrap;
+	flex-flow: row;
 	flex: 1;
-	height: 100%;
-	overflow-y: hidden;
 }
 
 #main > div {
 	padding: 10px 20px;
 	overflow-y: auto;
-	height: 100%;
 }
 
 #main #player {
