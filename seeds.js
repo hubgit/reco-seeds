@@ -100,10 +100,20 @@ app.controller('SeedsController', function ($scope, $http, $sce) {
         var requests = $scope.tracks.map(function(track) {
             var query = { track: track.name, artist: track.artist.name };
 
-            return $.spotify.search('track', query);
+            var request = $.spotify.search('track', query);
+
+            request.progress(function(jqXHR, textStatus, item) {
+                if (textStatus == 'start') {
+                    $scope.spotify = 'Looking up ' + track.artist.name + ' - ' + track.name;
+                }
+            });
+
+            return request;
         });
 
         $.when.apply($, requests).then(function() {
+            $scope.spotify = null;
+
             var ids = Array.prototype.map.call(arguments, function(data) {
                 if (data[0].tracks && data[0].tracks.length) {
                     return data[0].tracks[0].href.replace(/^spotify:track:/, '');

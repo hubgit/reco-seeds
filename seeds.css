@@ -27,6 +27,10 @@ body {
 	overflow-y: hidden;
 }
 
+#main #spotify {
+	width: 300px;
+}
+
 #tracks {
 	flex: 1;
 }
