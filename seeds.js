@@ -62,6 +62,7 @@ app.controller('SeedsController', function ($scope, $http, $sce, $timeout) {
         var segment = segment_event.segment;
 
         var track = {
+            ordinal: segment_event.version_offset,
             name: segment.title,
             tags: [],
             artist: {
@@ -93,7 +94,7 @@ app.controller('SeedsController', function ($scope, $http, $sce, $timeout) {
                     });
                     
                     $scope.tracks.sort(function(a, b) {
-                        return a.version_offset - b.version_offset;
+                        return a.ordinal - b.ordinal;
                     });
 
                     $scope.loading = false;
