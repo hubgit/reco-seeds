@@ -91,6 +91,10 @@ app.controller('SeedsController', function ($scope, $http, $sce, $timeout) {
                     $scope.tracks = data.version.segment_events.map(buildTrack).filter(function(track) {
                         return track.name && track.artist.name;
                     });
+                    
+                    $scope.tracks.sort(function(a, b) {
+                        return a.version_offset - b.version_offset;
+                    });
 
                     $scope.loading = false;
 
